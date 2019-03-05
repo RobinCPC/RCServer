@@ -32,8 +32,12 @@ add_library(RCServer
     src/rc_server.cpp src/rc_server.h
 )
 
+add_library(Motion
+	src/motion.cpp src/motion.h
+)
+
 add_executable(main
     src/main.cpp
 )
 # Link executable file with NexMotion.lib
-target_link_libraries(main RCServer ${NEXMOTION_LIBS}/NexMotion.lib)
+target_link_libraries(main RCServer Motion ${NEXMOTION_LIBS}/NexMotion.lib)

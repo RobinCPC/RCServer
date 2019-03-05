@@ -1,9 +1,14 @@
 #include "rc_server.h"
-#include <stdio.h>
-#include <string>
+#include "motion.h"
+
+using nmc::Artic;
+
+Artic minibot = Artic(NMC_DEVICE_TYPE_SIMULATOR);
 
 bool WINAPI communicationThread(PVOID PARA)
 {
+  minibot.enableRobot();
+  minibot.show3DView();
   SOCKET sock = (SOCKET)PARA;
 
   int iResult = 0;
@@ -22,20 +27,68 @@ bool WINAPI communicationThread(PVOID PARA)
       printf("Receive cmd from client: %s\n", in_recvbuf);
       msg = in_recvbuf;
       msg = msg.substr(0, msg.find("\r\n"));
-      if (msg.compare("MOVEJ") == 0)
+      if (msg.compare("movej") == 0)
       {
         std::string tmp = "You ask to Move Joint\n";
         oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
       }
-      else if (msg.compare("MOVEL") == 0)
+      else if (msg.compare("movel") == 0)
       {
         std::string tmp = "You ask to Move Line\n";
         oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
       }
-      else if (msg.compare("PTP") == 0)
+      else if (msg.compare("ptp") == 0)
       {
         std::string tmp = "You ask to Move PTP\n";
         oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+
+        Pos_T joint_val = minibot.getJointVal();
+        printf("Current Joint Value:\n");
+        for (int p : joint_val.pos)
+        {
+          printf("%d\t", p);
+        }
+        Pos_T cart_val = minibot.getFlangeVal();
+        printf("Current Cartesian Value:\n");
+        for (int c : cart_val.pos)
+        {
+          printf("%d\t", c);
+        }
+        minibot.moveJoint();
+      }
+      else if (msg.compare("get joint position") == 0)
+      {
+        std::string tmp = "You ask to get joint value\n";
+
+        Pos_T joint_val = minibot.getJointVal();
+        printf("Current Joint Value:\n");
+        tmp = "";
+        for (int p : joint_val.pos)
+        {
+          tmp += std::to_string(p) + " ";
+          printf("%d\t", p);
+        }
+        tmp += "\n";
+
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+
+      }
+      else if (msg.compare("get flange frame") == 0)
+      {
+        std::string tmp = "You ask to get flange cartesian position\n";
+
+        Pos_T cart_val = minibot.getFlangeVal();
+        printf("Current Cartesian Value:\n");
+        tmp = "";
+        for (int p : cart_val.pos)
+        {
+          tmp += std::to_string(p) + " ";
+          printf("%d\t", p);
+        }
+        tmp += "\n";
+
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+
       }
       else
       {
@@ -47,12 +100,10 @@ bool WINAPI communicationThread(PVOID PARA)
     else if(iResult == 0)
     {
       printf("Connection closed\n");
-      //sprintf(in_recvbuf,"Connection closed");
     }
     else
     {
       printf("recv failed: %d\n", WSAGetLastError());
-      //sprintf(in_recvbuf, "recv failed: %d", WSAGetLastError());
     }
 
   } while (iResult > 0);
@@ -60,6 +111,9 @@ bool WINAPI communicationThread(PVOID PARA)
   // cleanup
   closesocket(sock);
   WSACleanup();
+
+  minibot.close3DView();
+  minibot.disableRobot();
 
   printf("End Rec Thread\n");
   return false;
@@ -77,6 +131,8 @@ RCServer::~RCServer(void)
 
 bool RCServer::createServer(int iFamily, int iType, int iProtocol, int Port, char *IP)
 {
+  minibot.initialize();
+
   WORD wVersionRequested;
   WSADATA wsaData;
   int err;
@@ -185,6 +241,10 @@ bool RCServer::createServer(int iFamily, int iType, int iProtocol, int Port, cha
   HANDLE threadHD1;
   DWORD  dwID1;
   threadHD1=chBEGINTHREADEX(NULL, 0, communicationThread, accept_socket_, 0, &dwID1);
+
+  WaitForSingleObject(threadHD1, INFINITE);
+
+  minibot.shutdown();
 
   return true;
 }

@@ -6,6 +6,8 @@
 #ifndef RC_SERVER_H_
 #define RC_SERVER_H_
 
+#include <stdio.h>
+#include <string>
 #include <winsock2.h> // for socket
 #include <process.h>  // for _beginthreadex
 
