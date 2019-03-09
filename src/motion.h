@@ -10,7 +10,6 @@
 #include "NexMotion.h"
 #include "NexMotionError.h"
 #include <Windows.h>
-//#include <thread>
 #include <stdio.h>
 #include <stdlib.h>
 
