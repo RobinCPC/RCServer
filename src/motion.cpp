@@ -20,7 +20,7 @@ bool Artic::initialize(void)
   ret = NMC_DeviceOpenUp(devType, devIndex, &retDevID);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceOpenUp: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceOpenUp: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -52,7 +52,7 @@ bool Artic::initialize(void)
   ret = NMC_DeviceGetAxisCount(retDevID, &retSingleAxisCount);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceGetAxisCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceGetAxisCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -62,7 +62,7 @@ bool Artic::initialize(void)
   ret = NMC_DeviceGetGroupCount(retDevID, &retGroupCount);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceGetGroupCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceGetGroupCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -83,7 +83,7 @@ bool Artic::initialize(void)
   ret = NMC_DeviceGetGroupAxisCount(retDevID, group_index, &retGroupAxisCount);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceGetGroupAxisCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceGetGroupAxisCount: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -102,7 +102,7 @@ bool Artic::initialize(void)
   ret = NMC_GroupResetDriveAlmAll(retDevID, group_index);
   if (ret != 0)
   {
-    printf("ERROR! NMC_GroupResetDriveAlmAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_GroupResetDriveAlmAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
 
@@ -113,7 +113,7 @@ bool Artic::initialize(void)
   ret = NMC_GroupGetState(retDevID, group_index, &retState);
   if (ret != 0)
   {
-    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
 
@@ -136,7 +136,7 @@ bool Artic::enableRobot(void)
   ret = NMC_DeviceEnableAll(retDevID);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceEnableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceEnableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -155,7 +155,7 @@ bool Artic::enableRobot(void)
   ret = NMC_GroupGetState(retDevID, group_index, &retState);
   if (ret != 0)
   {
-    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
 
@@ -178,7 +178,7 @@ bool Artic::disableRobot(void)
   ret = NMC_DeviceDisableAll(retDevID);
   if (ret != 0)
   {
-    printf("ERROR! NMC_DeviceDisableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceDisableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
   else
@@ -191,7 +191,7 @@ bool Artic::disableRobot(void)
   ret = NMC_GroupGetState(retDevID, 0, &retState);
   if (ret != 0)
   {
-    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_GroupGetState(group index %d): (%d)%s.\n", group_index, ret, NMC_GetErrorDescription(ret, nullptr, 0));
     shutdown();
   }
 
@@ -212,13 +212,13 @@ bool Artic::shutdown(void)
   //=================================================
   ret = NMC_DeviceDisableAll(retDevID);
   if (ret != 0)
-    printf("ERROR! NMC_DeviceDisableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceDisableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   else
     printf("\nDevice disable all succeed.\n");
 
   ret = NMC_DeviceShutdown(retDevID);
   if (ret != 0)
-    printf("ERROR! NMC_DeviceShutdown: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("ERROR! NMC_DeviceShutdown: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   else
     printf("\nDevice shutdown succeed.\n");
 
@@ -263,17 +263,16 @@ bool Artic::moveJoint(void)
     ret = NMC_GroupPtpAcsAll( retDevID , group_index , groupAxesIdxMask , &cmdPosition );
     if( ret != 0 )
     {
-        printf( "ERROR! NMC_GroupPtpAcsAll: (%d)%s.\n", ret, NMC_GetErrorDescription( ret, NULL, 0 ) );
+        printf( "ERROR! NMC_GroupPtpAcsAll: (%d)%s.\n", ret, NMC_GetErrorDescription( ret, nullptr, 0 ) );
         shutdown();
     }
     else
-        printf( "\n NMC_GroupPtpAcsAll Success! Wait Command down.\n" );
+        printf( "\n NMC_GroupPtpAcsAll Success! Wait Command done.\n" );
 
     do {
       ret = NMC_GroupGetState(this->retDevID, this->devIndex, &group_state);
 
     } while (group_state != NMC_GROUP_STATE_STAND_STILL);
-
     printf("Group PTP Move Finish");
 
     return true;
@@ -286,7 +285,7 @@ Pos_T Artic::getJointVal(void)
 
   if (ret != ERR_NEXMOTION_SUCCESS)
   {
-    printf("get actual acs pose failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("get actual acs pose failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   }
 
   return this->acs_val;
@@ -298,7 +297,7 @@ Pos_T Artic::getFlangeVal(void)
 
   if (ret != ERR_NEXMOTION_SUCCESS)
   {
-    printf("get actual pcs pose failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, NULL, 0));
+    printf("get actual pcs pose failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   }
 
   return this->pcs_val;

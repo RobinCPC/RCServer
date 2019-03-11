@@ -98,7 +98,7 @@ bool RCServer::createServer(int iFamily, int iType, int iProtocol, int Port, cha
 bool RCServer::connectServer(void)
 {
   // Accept (and wait for) the connection
-  accept_socket_ = accept(listen_socket_, NULL, NULL);
+  accept_socket_ = accept(listen_socket_, nullptr, nullptr);
   if (accept_socket_ == INVALID_SOCKET)
   {
     printf("accept failed with error %ld\n", WSAGetLastError());

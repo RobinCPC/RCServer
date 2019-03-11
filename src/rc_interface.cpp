@@ -152,7 +152,7 @@ bool RCI::start(void)
 {
   rosServer.connectServer();
   // Create thread to handle incoming command from ROS (through TCPIP)
-  threadHD1=chBEGINTHREADEX(NULL, 0, communicationThread, this, 0, &dwID1);
+  threadHD1=chBEGINTHREADEX(nullptr, 0, communicationThread, this, 0, &dwID1);
 
   WaitForSingleObject(threadHD1, INFINITE);
 
@@ -195,12 +195,12 @@ vector<string> RCI::split(string cmd, string delimiter)
   {
     size_t len = end - start;
     token = cmd.substr(start, len);
-    list.push_back(token);
+    list.emplace_back(token);
     start += len + delimiter.length();
   }
   // catch last one
   token = cmd.substr(start, end - start);
-  list.push_back(token);
+  list.emplace_back(token);
   return list;
 }
 
