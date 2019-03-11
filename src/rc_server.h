@@ -30,12 +30,13 @@ public:
   bool createServer(int iFamily, int iType, int iProtocol, int Port, char *IP);
   bool connectServer(void);
   bool closeServer(void);
+  SOCKET getAcceptSocket(void);
   bool isRec(char*buf,int &length);
   bool sendWithoutThread(char *buf,int length);
-  SOCKET accept_socket_;  /*!< socket to accept connection */
 
 protected:
   SOCKET listen_socket_;  /*!< socket to listen and bind */
+  SOCKET accept_socket_;  /*!< socket to accept connection */
   char string_buf_[BUFLEN];
 };
 

@@ -114,14 +114,9 @@ bool RCServer::connectServer(void)
   return true;
 }
 
-bool RCServer::isRec(char*buf,int &length)
+SOCKET RCServer::getAcceptSocket(void)
 {
-  return false;
-}
-
-bool RCServer::sendWithoutThread(char *buf,int length)
-{
-  return false;
+  return this->accept_socket_;
 }
 
 bool RCServer::closeServer(void)
@@ -144,3 +139,14 @@ bool RCServer::closeServer(void)
 
   return true;
 }
+
+bool RCServer::isRec(char*buf,int &length)
+{
+  return false;
+}
+
+bool RCServer::sendWithoutThread(char *buf,int length)
+{
+  return false;
+}
+
