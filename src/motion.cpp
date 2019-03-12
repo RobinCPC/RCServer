@@ -212,68 +212,39 @@ bool Artic::shutdown(void)
   //=================================================
   ret = NMC_DeviceDisableAll(retDevID);
   if (ret != 0)
-    printf("ERROR! NMC_DeviceDisableAll: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
+    printf("ERROR! NMC_DeviceDisableAll: (%d) %s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   else
     printf("\nDevice disable all succeed.\n");
 
   ret = NMC_DeviceShutdown(retDevID);
   if (ret != 0)
-    printf("ERROR! NMC_DeviceShutdown: (%d)%s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
+    printf("ERROR! NMC_DeviceShutdown: (%d) %s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
   else
     printf("\nDevice shutdown succeed.\n");
 
   return true;
 }
 
-bool Artic::moveJoint(void)
+bool Artic::moveJoint(std::vector<double>& vals)
 {
-    Pos_T   refPosition_Inc      = { 5 , 5 , 5 , 5 , 5 , 5 };// current position plus a incremential distance to be a command target
-    Pos_T   cmdPosition          = {0};
-
+    Pos_T   cmdPosition      = {0};
     I32_T   groupAxesIdxMask = 0;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Y;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_Z;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_A;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_B;
-    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_C;
+    groupAxesIdxMask += NMC_GROUP_AXIS_MASK_X | NMC_GROUP_AXIS_MASK_Y |
+                        NMC_GROUP_AXIS_MASK_Z | NMC_GROUP_AXIS_MASK_A |
+                        NMC_GROUP_AXIS_MASK_B | NMC_GROUP_AXIS_MASK_C;
 
-    NMC_GroupGetActualPosAcs( retDevID , group_index , &cmdPosition );
-    for ( int idxAxisMask = 0; idxAxisMask < retGroupAxisCount ; idxAxisMask++ )
+    for (size_t i = 0; i < vals.size(); ++i)
     {
-        cmdPosition.pos[idxAxisMask] += refPosition_Inc.pos[idxAxisMask];
-    }// end for
-
-    //cmdPosition = refPosition_Inc;
-
-    printf( "\n***************\nStart to perform a motion of Group PTP to all axes .\n" );
-    printf( "DeviceID %d , GroupIndex %d \n Axis 1 Target: %.3f , Axis 2 Target: %.3f , Axis 3 Target: %.3f , Axis 4 Target: %.3f , Axis 5 Target: %.3f , Axis 6 Target: %.3f , \n"
-            , retDevID
-            , group_index
-            , cmdPosition.pos[0]
-            , cmdPosition.pos[1]
-            , cmdPosition.pos[2]
-            , cmdPosition.pos[3]
-            , cmdPosition.pos[4]
-            , cmdPosition.pos[5]
-    );
-
-    Sleep( sleepTime );
-
+      cmdPosition.pos[i] = vals[i];
+    }
     ret = NMC_GroupPtpAcsAll( retDevID , group_index , groupAxesIdxMask , &cmdPosition );
     if( ret != 0 )
     {
-        printf( "ERROR! NMC_GroupPtpAcsAll: (%d)%s.\n", ret, NMC_GetErrorDescription( ret, nullptr, 0 ) );
-        shutdown();
+        printf( "ERROR! NMC_GroupPtpAcsAll: (%d) %s.\n", ret, NMC_GetErrorDescription( ret, nullptr, 0 ) );
+        //shutdown();
     }
     else
         printf( "\n NMC_GroupPtpAcsAll Success! Wait Command done.\n" );
-
-    do {
-      ret = NMC_GroupGetState(this->retDevID, this->devIndex, &group_state);
-
-    } while (group_state != NMC_GROUP_STATE_STAND_STILL);
-    printf("Group PTP Move Finish");
 
     return true;
 }
@@ -303,6 +274,35 @@ Pos_T Artic::getFlangeVal(void)
   return this->pcs_val;
 }
 
+void Artic::setDevType(I32_T type)
+{
+  this->devType = type;
+  return;
+}
+
+bool Artic::checkState(void)
+{
+  ret = NMC_GroupGetState(retDevID, group_index, &group_state);
+  if (ret != ERR_NEXMOTION_SUCCESS)
+  {
+    printf("get group state failed. error code: %d\n %s.\n", ret, NMC_GetErrorDescription(ret, nullptr, 0));
+    return false;
+  }
+  if (group_state == NMC_GROUP_STATE_STAND_STILL)
+    return true;
+  else
+    return false;
+}
+
+bool Artic::haltMotion(void)
+{
+  ret = NMC_GroupHalt(this->retDevID, this->group_index);
+  if (ret == ERR_NEXMOTION_SUCCESS)
+    return true;
+  else
+    return false;
+}
+
 void Artic::show3DView(void)
 {
   ret = NMC_Group3DShow(retDevID, group_index);
@@ -319,7 +319,7 @@ char* Artic::displayErrorMessage(RTN_ERR err_code)
 {
   const U32_T err_des_size= 512;
   char err_des[err_des_size] = "";
-  const char* tmp = NMC_GetErrorDescription(err_code, err_des, err_des_size);
+  NMC_GetErrorDescription(err_code, err_des, err_des_size);
   return err_des;
 }
 

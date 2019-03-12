@@ -24,7 +24,6 @@ bool WINAPI communicationThread(PVOID PARA)
       printf("Receive cmd from client: %s\n", in_recvbuf);
       msg = in_recvbuf;
       ui->trim(msg);
-      //msg = msg.substr(0, msg.find("\r\n"));
       vector<string> tokens = ui->split(msg, ":");
       string cmd;
       vector<string> params{};
@@ -39,34 +38,26 @@ bool WINAPI communicationThread(PVOID PARA)
         params = ui->split(tokens[1]," ");
       }
 
-      if (cmd.compare("movej") == 0)
-      {
-        std::string tmp = "You ask to Move Joint\n";
-        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
-      }
-      else if (cmd.compare("movel") == 0)
-      {
-        std::string tmp = "You ask to Move Line\n";
-        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
-      }
-      else if (cmd.compare("ptp") == 0)
+      if (cmd.compare("ptp") == 0)
       {
         std::string tmp = "You ask to Move PTP\n";
+        if (params.size() < 6)
+        {
+          tmp += "But input parameters need 6 value\n";
+          oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+          continue;
+        }
         oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
 
-        Pos_T joint_val = minibot.getJointVal();
-        printf("Current Joint Value:\n");
-        for (F64_T p : joint_val.pos)
+        vector<double> jnt_val;
+        printf("\nTarget Joint Value:\n");
+        for (auto p : params)
         {
-          printf("%4.4f\t", p);
+          jnt_val.emplace_back(std::stod(p));
+          printf("%4.4f\t", jnt_val.back());
         }
-        Pos_T cart_val = minibot.getFlangeVal();
-        printf("Current Cartesian Value:\n");
-        for (F64_T c : cart_val.pos)
-        {
-          printf("%4.4f\t", c);
-        }
-        minibot.moveJoint();
+
+        minibot.moveJoint(jnt_val);
       }
       else if (cmd.compare("get joint position") == 0)
       {
@@ -102,10 +93,37 @@ bool WINAPI communicationThread(PVOID PARA)
         oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
 
       }
+      else if (cmd.compare("get state") == 0)
+      {
+        std::string tmp = "Still moving\n";
+        if (minibot.checkState())
+          tmp = "Motion Done\n";
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+      }
+      else if (cmd.compare("halt") == 0)
+      {
+        printf("You ask to halt the minibot\n");
+        bool result = minibot.haltMotion();
+
+        std::string tmp = "Halt command send\n";
+        if (!result)
+          tmp = "Halt command failed\n";
+
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+      }
+      else if (cmd.compare("movej") == 0)
+      {
+        std::string tmp = "You ask to Move Joint\n";
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+      }
+      else if (cmd.compare("movel") == 0)
+      {
+        std::string tmp = "You ask to Move Line\n";
+        oResult = send(sock, tmp.c_str(), strlen(tmp.c_str()), 0);
+      }
       else
       {
         cmd = "UnKnown Command\nBack --> " + cmd + "\n";
-        //msg = "Back --> "  + std::to_string(1.0) + in_recvbuf;
         oResult = send(sock, cmd.c_str(), strlen(cmd.c_str()), 0);
       }
     }
@@ -137,6 +155,11 @@ namespace nmc
 RCI::RCI()
 {
   isStart = false;
+}
+
+RCI::RCI(I32_T rbt_type)
+{
+  minibot.setDevType(rbt_type);
 }
 
 RCI::~RCI(){}

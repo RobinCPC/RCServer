@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 namespace nmc
 {
@@ -30,11 +31,17 @@ public:
 
   bool shutdown(void);
 
-  bool moveJoint(void);
+  bool moveJoint(std::vector<double>& vals);
 
   Pos_T getJointVal(void);
 
   Pos_T getFlangeVal(void);
+
+  void setDevType(I32_T type);
+
+  bool checkState(void);
+
+  bool haltMotion(void);
 
   void show3DView(void);
 
@@ -57,8 +64,8 @@ private:
   I32_T group_status       = 0;
   I32_T vel_ratio          = 0;
   I32_T devType;
-  Pos_T acs_val;
-  Pos_T pcs_val;
+  Pos_T acs_val = {0.};
+  Pos_T pcs_val = {0.};
 
   const int numAxis = 6;
   const int sleepTime = 500;

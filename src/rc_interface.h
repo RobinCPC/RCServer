@@ -37,6 +37,8 @@ class RCI
 public:
   RCI();
 
+  RCI(I32_T rbt_type);
+
   ~RCI();
 
   bool initialize(void);

@@ -4,7 +4,7 @@
 
 int main(int argc, const char *argv[])
 {
-  nmc::RCI ui = nmc::RCI();
+  nmc::RCI ui = nmc::RCI(NMC_DEVICE_TYPE_SIMULATOR);
   ui.initialize();
   ui.start();
   ui.terminate();
