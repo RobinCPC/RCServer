@@ -10,7 +10,7 @@ RCServer::~RCServer(void)
 {}
 
 
-bool RCServer::createServer(int iFamily, int iType, int iProtocol, int Port, char *IP)
+bool RCServer::createServer(int Port, char *IP)
 {
   WORD wVersionRequested;
   WSADATA wsaData;
@@ -45,9 +45,9 @@ bool RCServer::createServer(int iFamily, int iType, int iProtocol, int Port, cha
     printf("The Winsock 2.2 dll was found okay\n");
 
   // Create a listening socket for connect to server
-  //int iFamily = AF_INET;
-  //int iType = SOCK_STREAM;
-  //int iProtocol = IPPROTO_IP;
+  int iFamily = AF_INET;
+  int iType = SOCK_STREAM;
+  int iProtocol = IPPROTO_IP;
   int iResult = 0;
   printf("Creating listen socket...");
   listen_socket_ = socket(iFamily, iType, iProtocol);

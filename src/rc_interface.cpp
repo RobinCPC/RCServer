@@ -5,8 +5,10 @@ bool WINAPI communicationThread(PVOID PARA)
   nmc::RCI* ui = (nmc::RCI*)PARA;
   nmc::Artic minibot = ui->getRobot();
   SOCKET sock = ui->getSocket();
+
   minibot.enableRobot();
-  minibot.show3DView();
+  if(ui->show3D)
+    minibot.show3DView();
 
   int iResult = 0;
   int oResult = 0;
@@ -142,7 +144,8 @@ bool WINAPI communicationThread(PVOID PARA)
   closesocket(sock);
   WSACleanup();
 
-  minibot.close3DView();
+  if(ui->show3D)
+    minibot.close3DView();
   minibot.disableRobot();
 
   printf("End Rec Thread\n");
@@ -157,17 +160,46 @@ RCI::RCI()
   isStart = false;
 }
 
-RCI::RCI(I32_T rbt_type)
-{
-  minibot.setDevType(rbt_type);
-}
-
 RCI::~RCI(){}
+
+bool RCI::loadParameter(void)
+{
+  json config;
+  std::ifstream ifstr ("C:\\NEXCOBOT\\config.json", std::ifstream::in);
+  if (!ifstr.good())
+  {
+    std::cout << "Can't open the config file!\n";
+    return -1;
+  }
+
+  ifstr >> config;
+  std::cout << config.dump() << std::endl;
+  this->port = config["port"].get<int>();
+  this->mode = config["mode"].get<std::string>();
+  this->show3D = config["show3D"].get<bool>();
+  // check to find cwd
+  char buffer[256];
+  DWORD val = GetCurrentDirectoryA(sizeof(buffer), buffer);
+  if (val)
+  {
+    std::cout << buffer << std::endl;
+  }
+
+  return 0;
+}
 
 bool RCI::initialize(void)
 {
+  if (this->mode.compare("Operation") == 0)
+  { 
+    minibot.setDevType(NMC_DEVICE_TYPE_ETHERCAT);
+  }
+  else if (this->mode.compare("Simulation") == 0)
+  {
+    minibot.setDevType(NMC_DEVICE_TYPE_SIMULATOR);
+  }
   minibot.initialize();
-  int ret = rosServer.createServer(AF_INET, SOCK_STREAM, IPPROTO_TCP, PORT, "");
+  int ret = rosServer.createServer(this->port, "");
   return ret;
 }
 

@@ -27,7 +27,7 @@ public:
   ~RCServer();
 
 public:
-  bool createServer(int iFamily, int iType, int iProtocol, int Port, char *IP);
+  bool createServer(int Port, char *IP);
   bool connectServer(void);
   bool closeServer(void);
   SOCKET getAcceptSocket(void);

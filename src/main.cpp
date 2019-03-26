@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include "rc_interface.h"
 
+
 int main(int argc, const char *argv[])
 {
-  nmc::RCI ui = nmc::RCI(NMC_DEVICE_TYPE_SIMULATOR);
+  nmc::RCI ui = nmc::RCI();
+  ui.loadParameter();
   ui.initialize();
   ui.start();
   ui.terminate();

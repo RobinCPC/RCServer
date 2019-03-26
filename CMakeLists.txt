@@ -24,6 +24,7 @@ ENDIF()
 # include head file
 include_directories(
     #    include
+	third_party
     ${NEXMOTION_INCLUDE_DIR}
     )
 

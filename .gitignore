@@ -33,3 +33,6 @@
 
 # Compile folder
 build/
+
+# third party library
+third_party/

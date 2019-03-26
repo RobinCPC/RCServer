@@ -11,9 +11,14 @@
 #include <process.h>  // for _beginthreadex
 #include <vector>
 //#include <thread>
+#include <iostream>   // cout, endl
+#include <fstream>    // ifstream, ofsream
+#include "nlohmann\json.hpp"
+#include <Windows.h>  // GetCurrentDirectoryA
 
 using std::vector;
 using std::string;
+using json = nlohmann::json;
 
 //define thread
 //=================================================================
@@ -37,10 +42,9 @@ class RCI
 public:
   RCI();
 
-  RCI(I32_T rbt_type);
-
   ~RCI();
 
+  bool loadParameter(void);
   bool initialize(void);
   bool start(void);
   bool terminate(void);
@@ -50,6 +54,11 @@ public:
 
   string& trim(string &str, const string& end_word = "\t\n\v\f\r ");
   vector<string> split(string cmd, string delimiter);
+
+  // Paramters load from json
+  int port;
+  bool show3D;
+  string mode;
 
 private:
   bool isStart;
