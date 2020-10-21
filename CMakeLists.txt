@@ -11,13 +11,13 @@ cmake_host_system_information(RESULT ENV QUERY IS_64BIT)
 # Choose 32bit or 64bit
 IF (ENV)
 message(STATUS  "Windows 64-bit environment")
-SET(NEXMOTION_INCLUDE_DIR "C:\\Program Files (x86)\\NEXCOBOT\\NexGMC\\Header")
-SET(NEXMOTION_LIBS  "C:\\Program Files (x86)\\NEXCOBOT\\NexGMC\\Lib" )
+SET(NEXMOTION_INCLUDE_DIR "C:\\Program Files\\NEXCOBOT\\NexMotion\\Header")
+SET(NEXMOTION_LIBS  "C:\\Program Files\\NEXCOBOT\\NexMotion\\Lib" )
 
 ELSE()
 message(STATUS  "Windows 32-bit environment")
-SET(NEXMOTION_INCLUDE_DIR "C:\\Program Files\\NEXCOBOT\\NexGMC\\Header")
-SET(NEXMOTION_LIBS  "C:\\Program Files\\NEXCOBOT\\NexGMC\\Lib" )
+SET(NEXMOTION_INCLUDE_DIR "C:\\Program Files\\NEXCOBOT\\NexMotion\\Header")
+SET(NEXMOTION_LIBS  "C:\\Program Files\\NEXCOBOT\\NexMMotion\\Lib" )
 
 ENDIF()
 
@@ -41,4 +41,4 @@ add_executable(main
     src/main.cpp src/rc_interface.cpp src/rc_interface.h
 )
 # Link executable file with NexMotion.lib
-target_link_libraries(main RCServer Motion ${NEXMOTION_LIBS}/NexMotion.lib)
+target_link_libraries(main RCServer Motion ${NEXMOTION_LIBS}/NexMotion_x64.lib)
